@@ -1,4 +1,4 @@
-package com.saxipapsi.weathermap.domain.use_case
+package com.saxipapsi.weathermap.domain.use_case.weather
 
 import com.saxipapsi.weathermap.common.Resource
 import com.saxipapsi.weathermap.data.remote.dto.ForecastWeatherDto

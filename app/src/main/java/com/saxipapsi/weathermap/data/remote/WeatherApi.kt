@@ -1,10 +1,8 @@
 package com.saxipapsi.weathermap.data.remote
 
-import com.saxipapsi.weathermap.common.Constant
 import com.saxipapsi.weathermap.data.remote.dto.ForecastWeatherDto
 import com.saxipapsi.weathermap.data.remote.dto.RealtimeWeatherDto
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface WeatherApi {
@@ -22,16 +20,12 @@ interface WeatherApi {
     * */
     @GET("/current.json")
     suspend fun getRealtimeWeather(
-        @Header("X-RapidAPI-Host") host: String = Constant.HOST,
-        @Header("X-RapidAPI-Key") token: String = Constant.TOKEN,
         @Query("q") data: String
     ): RealtimeWeatherDto
 
     @GET("/forecast.json")
     suspend fun getForecastWeather(
-        @Header("X-RapidAPI-Host") host: String = Constant.HOST,
-        @Header("X-RapidAPI-Key") token: String = Constant.TOKEN,
         @Query("q") data: String,
-        @Query("day") day: Int
+        @Query("days") day: Int
     ): ForecastWeatherDto
 }
