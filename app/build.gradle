@@ -3,7 +3,11 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
+apply plugin: 'kotlin-kapt'
 
+def apikeyPropertiesFile = file("../apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load( new FileInputStream(apikeyPropertiesFile))
 
 android {
     compileSdk 33
@@ -19,9 +23,57 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("debug") {
+//            signingConfig = signingConfigs.getByName("debug")
+        }
+        getByName("release") {
             minifyEnabled false
+//            signingConfig = signingConfigs.getByName("release")
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions("environment")
+    productFlavors {
+        create("production") {
+            dimension = "environment"
+            resValue("string", "app_name", "WeatherMap")
+            def insiderPartnerName = "weathermapprod"
+            buildConfigField("String", "INSIDER_PARTNER_NAME", "\"$insiderPartnerName\"")
+            manifestPlaceholders["partner"] = insiderPartnerName
+
+            def weatherKey = apikeyProperties["weatherApiKey"] as String
+            resValue("string", "weather_api_key", weatherKey)
+
+            //verification
+            buildConfigField("String", "VERIFICATION_APP_PACKAGE", "\"com.saxipapsi.weathermap\"")
+        }
+        create("dev") {
+            dimension = "environment"
+            resValue("string", "app_name", "WeatherMap Dev")
+            applicationIdSuffix = ".dev"
+            def insiderPartnerName = "weatheruat"
+            buildConfigField("String", "INSIDER_PARTNER_NAME", "\"$insiderPartnerName\"")
+            manifestPlaceholders["partner"] = insiderPartnerName
+
+            def weatherKey = apikeyProperties["weatherApiDebugKey"] as String
+            resValue("string", "weather_api_key", weatherKey)
+
+            //verification
+            buildConfigField("String", "VERIFICATION_APP_PACKAGE", "\"com.saxipapsi.weathermap.dev\"")
+        }
+        create("staging") {
+            dimension = "environment"
+            resValue("string", "app_name", "WeatherMap Staging")
+            applicationIdSuffix = ".staging"
+            def insiderPartnerName = "weatheruat"
+            buildConfigField("String", "INSIDER_PARTNER_NAME", "\"$insiderPartnerName\"")
+            manifestPlaceholders["partner"] = insiderPartnerName
+
+            def weatherKey = apikeyProperties["weatherApiDebugKey"] as String
+            resValue("string", "weather_api_key", weatherKey)
+
+            //verification
+            buildConfigField("String", "VERIFICATION_APP_PACKAGE", "\"com.saxipapsi.weathermap.staging\"")
         }
     }
     compileOptions {
@@ -81,13 +133,19 @@ dependencies {
 
     // Room components
     def room_version = "2.5.2"
-    implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    implementation "androidx.room:room-guava:$room_version"//optional - Guava support for Room, including Optional and ListenableFuture
-    testImplementation "androidx.room:room-testing:$room_version"//optional - Test helpers
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    //annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-guava:$room_version"
+//optional - Guava support for Room, including Optional and ListenableFuture
     implementation "androidx.room:room-paging:$room_version"//optional - Paging 3 Integration
+    testImplementation "androidx.room:room-testing:$room_version"//optional - Test helpers
+
+    /*Image*/
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+

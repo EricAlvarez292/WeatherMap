@@ -2,7 +2,7 @@ package com.saxipapsi.weathermap.data.remote.dto
 
 data class CurrentDto(
     val cloud: Int,
-    val conditionDto: ConditionDto,
+    val condition: ConditionDto,
     val feelslike_c: Double,
     val feelslike_f: Double,
     val gust_kph: Double,
@@ -15,7 +15,7 @@ data class CurrentDto(
     val precip_mm: Double,
     val pressure_in: Double,
     val pressure_mb: Int,
-    val temp_c: Int,
+    val temp_c: Double,
     val temp_f: Double,
     val uv: Int,
     val vis_km: Int,
